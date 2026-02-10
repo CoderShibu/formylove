@@ -63,7 +63,7 @@ const MusicPlayer = () => {
     }}>
       <audio
         ref={audioRef}
-        src="/meri-banoge-kya-reprise.mp3"
+        src="/audio/meri-banogi-kya.mp3"
         preload="auto"
       />
       <button
