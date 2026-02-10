@@ -14,26 +14,12 @@ const MusicPlayer = () => {
       
       const handleCanPlay = () => {
         setIsLoaded(true);
-        // Try to auto-play after user interaction or page load
-        const attemptPlay = () => {
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                setIsPlaying(true);
-              })
-              .catch((error) => {
-                console.log("Auto-play was prevented:", error);
-                setIsPlaying(false);
-              });
-          }
-        };
-
-        // Try immediate play
-        attemptPlay();
-        
-        // Also try after a short delay (some browsers need this)
-        setTimeout(attemptPlay, 1000);
+        // Auto-play immediately when ready
+        audio.play().then(() => {
+          setIsPlaying(true);
+        }).catch(() => {
+          console.log("Auto-play prevented - user interaction needed");
+        });
       };
 
       const handleError = (e: Event) => {
@@ -59,16 +45,11 @@ const MusicPlayer = () => {
       audio.pause();
       setIsPlaying(false);
     } else {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            console.log("Play was prevented:", error);
-          });
-      }
+      audio.play().then(() => {
+        setIsPlaying(true);
+      }).catch((error) => {
+        console.log("Play error:", error);
+      });
     }
   };
 
@@ -76,7 +57,7 @@ const MusicPlayer = () => {
     <div className="fixed top-4 right-4 z-50">
       <audio
         ref={audioRef}
-        src="/meri-banoge-kya-reprise.mp3"
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
         preload="auto"
       />
       <button
