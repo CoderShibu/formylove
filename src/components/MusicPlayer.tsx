@@ -3,53 +3,54 @@ import { Play, Pause, Music } from "lucide-react";
 
 const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
       audio.loop = true;
-      audio.volume = 0.3;
+      audio.volume = 0.5;
       
-      const handleCanPlay = () => {
-        setIsLoaded(true);
-        // Auto-play immediately when ready
-        audio.play().then(() => {
-          setIsPlaying(true);
-        }).catch(() => {
-          console.log("Auto-play prevented - user interaction needed");
-        });
+      // Try to play immediately
+      const playAudio = () => {
+        audio.play()
+          .then(() => {
+            setIsPlaying(true);
+            console.log("Music started playing");
+          })
+          .catch((error) => {
+            console.log("Auto-play prevented:", error);
+            setIsPlaying(false);
+          });
       };
 
-      const handleError = (e: Event) => {
-        console.error("Audio loading error:", e);
-        setIsLoaded(false);
-      };
-
-      audio.addEventListener('canplay', handleCanPlay);
-      audio.addEventListener('error', handleError);
-
+      // Play when loaded
+      audio.addEventListener('canplay', playAudio);
+      
       return () => {
-        audio.removeEventListener('canplay', handleCanPlay);
-        audio.removeEventListener('error', handleError);
+        audio.removeEventListener('canplay', playAudio);
       };
     }
   }, []);
 
   const toggleMusic = () => {
+    console.log("Button clicked!");
     const audio = audioRef.current;
-    if (!audio || !isLoaded) return;
+    if (!audio) return;
 
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
+      console.log("Music paused");
     } else {
-      audio.play().then(() => {
-        setIsPlaying(true);
-      }).catch((error) => {
-        console.log("Play error:", error);
-      });
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+          console.log("Music resumed");
+        })
+        .catch((error) => {
+          console.log("Play error:", error);
+        });
     }
   };
 
@@ -57,17 +58,14 @@ const MusicPlayer = () => {
     <div className="fixed top-4 right-4 z-50">
       <audio
         ref={audioRef}
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+        src="https://www.bensound.com/bensound-memories.mp3"
         preload="auto"
       />
       <button
         onClick={toggleMusic}
-        disabled={!isLoaded}
-        className={`bg-white/20 backdrop-blur-md text-white p-3 rounded-full shadow-lg hover:bg-white/30 transition-all duration-300 border border-white/30 ${
-          !isLoaded ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
+        className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 border-2 border-white"
         aria-label={isPlaying ? "Pause music" : "Play music"}
-        title={isLoaded ? (isPlaying ? "Pause music" : "Play music") : "Loading music..."}
+        title={isPlaying ? "Pause music" : "Play music"}
       >
         {isPlaying ? (
           <Pause className="w-5 h-5" />
