@@ -10,12 +10,7 @@ import ResponseSlide from "@/components/slides/ResponseSlide";
 import ConfirmationSlide from "@/components/slides/ConfirmationSlide";
 import LetterSlide from "@/components/slides/LetterSlide";
 
-interface Props {
-  audioRef: React.RefObject<HTMLAudioElement | null>;
-  musicUnlocked: boolean;
-}
-
-const Index = ({ audioRef, musicUnlocked }: Props) => {
+const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [confettiActive, setConfettiActive] = useState(false);
   const [heavyHearts, setHeavyHearts] = useState(false);
@@ -44,24 +39,7 @@ const Index = ({ audioRef, musicUnlocked }: Props) => {
 
       <div className="relative w-full h-full">
         <SlideTransition active={currentSlide === 0}>
-          <OpeningSlide onYes={() => {
-            if (audioRef.current && !musicUnlocked) {
-              audioRef.current.volume = 0;
-              audioRef.current.play().then(() => {
-                let v = 0;
-                const fade = setInterval(() => {
-                  if (!audioRef.current) return;
-                  if (v < 0.25) {
-                    v += 0.02;
-                    audioRef.current.volume = v;
-                  } else {
-                    clearInterval(fade);
-                  }
-                }, 120);
-              }).catch(() => {});
-            }
-            goToSlide(1);
-          }} />
+          <OpeningSlide onYes={() => goToSlide(1)} />
         </SlideTransition>
 
         <SlideTransition active={currentSlide === 1}>
