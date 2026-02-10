@@ -63,7 +63,7 @@ const MusicPlayer = () => {
     }}>
       <audio
         ref={audioRef}
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+        src="/meri-banoge-kya-reprise.mp3"
         preload="auto"
       />
       <button

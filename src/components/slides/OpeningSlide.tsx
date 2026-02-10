@@ -72,7 +72,7 @@ const OpeningSlide = ({ onYes }: Props) => {
         onClick={(e) => e.preventDefault()}
         className={`absolute px-6 py-2.5 sm:px-8 sm:py-3 rounded-full bg-muted text-muted-foreground font-body font-bold text-base sm:text-lg
           shadow-md cursor-default select-none
-          transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]
+          transition-all duration-300 ease-in-out
           ${showButton ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         style={{
           transform: hasMoved
