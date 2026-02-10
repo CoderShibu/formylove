@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -11,39 +11,36 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [musicStarted, setMusicStarted] = useState(false);
-  const [musicOn, setMusicOn] = useState(true);
+  const [musicUnlocked, setMusicUnlocked] = useState(false);
 
-  const startMusic = () => {
-    if (!audioRef.current || musicStarted) return;
+  useEffect(() => {
+    const unlockAudio = () => {
+      if (!audioRef.current || musicUnlocked) return;
 
-    audioRef.current.volume = 0;
-    audioRef.current.play().catch(() => {});
-    setMusicStarted(true);
+      audioRef.current.volume = 0;
+      audioRef.current.play().then(() => {
+        let v = 0;
+        const fade = setInterval(() => {
+          if (!audioRef.current) return;
+          if (v < 0.25) {
+            v += 0.02;
+            audioRef.current.volume = v;
+          } else {
+            clearInterval(fade);
+          }
+        }, 120);
 
-    // smooth fade-in
-    let vol = 0;
-    const fade = setInterval(() => {
-      if (!audioRef.current) return;
-      if (vol < 0.25) {
-        vol += 0.02;
-        audioRef.current.volume = vol;
-      } else {
-        clearInterval(fade);
-      }
-    }, 120);
-  };
+        setMusicUnlocked(true);
+      }).catch(() => {});
+    };
 
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
+    // listen for FIRST real interaction
+    document.addEventListener("pointerdown", unlockAudio, { once: true });
 
-    if (musicOn) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(() => {});
-    }
-    setMusicOn(!musicOn);
-  };
+    return () => {
+      document.removeEventListener("pointerdown", unlockAudio);
+    };
+  }, [musicUnlocked]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -54,8 +51,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index 
               audioRef={audioRef} 
-              startMusic={startMusic} 
-              musicStarted={musicStarted}
+              musicUnlocked={musicUnlocked}
             />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -63,10 +59,18 @@ const App = () => {
         
         {/* Global Music Toggle Button */}
         <button
-          onClick={toggleMusic}
+          onClick={() => {
+            if (audioRef.current) {
+              if (musicUnlocked) {
+                audioRef.current.pause();
+              } else {
+                audioRef.current.play().catch(() => {});
+              }
+            }
+          }}
           className="fixed top-4 right-4 z-50 rounded-full bg-pink-200/70 px-3 py-2 text-sm backdrop-blur-md shadow-md hover:scale-105 transition"
         >
-          {musicOn ? "🔊" : "🔇"}
+          {musicUnlocked ? "🔊" : "🔇"}
         </button>
         
         {/* Global Audio Element */}

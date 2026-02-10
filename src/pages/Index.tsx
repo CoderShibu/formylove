@@ -14,9 +14,10 @@ interface Props {
   audioRef: React.RefObject<HTMLAudioElement | null>;
   startMusic: () => void;
   musicStarted: boolean;
+  musicUnlocked: boolean;
 }
 
-const Index = ({ audioRef, startMusic, musicStarted }: Props) => {
+const Index = ({ audioRef, startMusic, musicStarted, musicUnlocked }: Props) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [confettiActive, setConfettiActive] = useState(false);
   const [heavyHearts, setHeavyHearts] = useState(false);
@@ -46,7 +47,21 @@ const Index = ({ audioRef, startMusic, musicStarted }: Props) => {
       <div className="relative w-full h-full">
         <SlideTransition active={currentSlide === 0}>
           <OpeningSlide onYes={() => {
-            startMusic();
+            if (audioRef.current && !musicUnlocked) {
+              audioRef.current.volume = 0;
+              audioRef.current.play().then(() => {
+                let v = 0;
+                const fade = setInterval(() => {
+                  if (!audioRef.current) return;
+                  if (v < 0.25) {
+                    v += 0.02;
+                    audioRef.current.volume = v;
+                  } else {
+                    clearInterval(fade);
+                  }
+                }, 120);
+              }).catch(() => {});
+            }
             goToSlide(1);
           }} />
         </SlideTransition>
