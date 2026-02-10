@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { Play, Pause, Music } from "lucide-react";
 
 const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -11,20 +10,18 @@ const MusicPlayer = () => {
       audio.loop = true;
       audio.volume = 0.5;
       
-      // Try to play immediately
       const playAudio = () => {
         audio.play()
           .then(() => {
             setIsPlaying(true);
-            console.log("Music started playing");
+            console.log("✅ Music playing!");
           })
           .catch((error) => {
-            console.log("Auto-play prevented:", error);
+            console.log("❌ Auto-play failed:", error);
             setIsPlaying(false);
           });
       };
 
-      // Play when loaded
       audio.addEventListener('canplay', playAudio);
       
       return () => {
@@ -34,44 +31,63 @@ const MusicPlayer = () => {
   }, []);
 
   const toggleMusic = () => {
-    console.log("Button clicked!");
+    console.log("🔘 Music button clicked!");
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio) {
+      console.log("❌ Audio ref not found");
+      return;
+    }
 
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
-      console.log("Music paused");
+      console.log("⏸️ Music paused");
     } else {
       audio.play()
         .then(() => {
           setIsPlaying(true);
-          console.log("Music resumed");
+          console.log("▶️ Music playing");
         })
         .catch((error) => {
-          console.log("Play error:", error);
+          console.log("❌ Play failed:", error);
         });
     }
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div style={{
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      zIndex: 9999
+    }}>
       <audio
         ref={audioRef}
-        src="https://www.bensound.com/bensound-memories.mp3"
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
         preload="auto"
       />
       <button
         onClick={toggleMusic}
-        className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 border-2 border-white"
-        aria-label={isPlaying ? "Pause music" : "Play music"}
-        title={isPlaying ? "Pause music" : "Play music"}
+        style={{
+          backgroundColor: isPlaying ? '#dc2626' : '#16a34a',
+          color: 'white',
+          border: '2px solid white',
+          padding: '12px',
+          borderRadius: '50%',
+          cursor: 'pointer',
+          fontSize: '16px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+        title={isPlaying ? "Pause Music" : "Play Music"}
       >
-        {isPlaying ? (
-          <Pause className="w-5 h-5" />
-        ) : (
-          <Music className="w-5 h-5" />
-        )}
+        {isPlaying ? '⏸️' : '🎵'}
       </button>
     </div>
   );
