@@ -12,12 +12,10 @@ import LetterSlide from "@/components/slides/LetterSlide";
 
 interface Props {
   audioRef: React.RefObject<HTMLAudioElement | null>;
-  startMusic: () => void;
-  musicStarted: boolean;
   musicUnlocked: boolean;
 }
 
-const Index = ({ audioRef, startMusic, musicStarted, musicUnlocked }: Props) => {
+const Index = ({ audioRef, musicUnlocked }: Props) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [confettiActive, setConfettiActive] = useState(false);
   const [heavyHearts, setHeavyHearts] = useState(false);
@@ -93,5 +91,7 @@ const Index = ({ audioRef, startMusic, musicStarted, musicUnlocked }: Props) => 
     </div>
   );
 };
+
+export default Index;
 
 export default Index;
